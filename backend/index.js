@@ -23,7 +23,11 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+  origin: "*", // Allows all origins
+  methods: ["GET", "POST", "PUT", "DELETE"], // Specifies allowed HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"] // Specifies allowed headers
+}));
 app.use(helmet());
 
 // Swagger configuration
@@ -35,13 +39,7 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'API for distributing coupons to users in a round-robin manner',
     },
-    servers: [
-      {
-        url: process.env.NODE_ENV === 'production' 
-          ? 'https://yashvi-round-robin-backend.vercel.app/api' 
-          : `http://localhost:${PORT}`,
-      },
-    ],
+
   },
   apis: ['./routes/*.js', './models/*.js'],
 };

@@ -23,12 +23,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://yashvi-round-robin-frontend.vercel.app/' 
-    : 'http://localhost:3000',
-  credentials: true
-}));
+app.use(cors());
 app.use(helmet());
 
 // Swagger configuration
@@ -43,7 +38,7 @@ const swaggerOptions = {
     servers: [
       {
         url: process.env.NODE_ENV === 'production' 
-          ? 'https://yashvi-round-robin-frontend.vercel.app/api' 
+          ? 'https://yashvi-round-robin-backend.vercel.app/api' 
           : `http://localhost:${PORT}`,
       },
     ],

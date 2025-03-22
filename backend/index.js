@@ -31,6 +31,7 @@ app.use(
     ], // Allows all origins
     methods: ["GET", "POST", "PUT", "DELETE"], // Specifies allowed HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Specifies allowed headers
+    credentials:true
   })
 );
 app.use(helmet());

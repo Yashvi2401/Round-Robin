@@ -1,16 +1,16 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const dotenv = require('dotenv');
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-const cookieParser = require('cookie-parser');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const helmet = require("helmet");
+const dotenv = require("dotenv");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+const cookieParser = require("cookie-parser");
 
 // Import routes
-const couponRoutes = require('./routes/couponRoutes');
-const userRoutes = require('./routes/userRoutes');
-const claimHistoryRoutes = require('./routes/claimHistoryRoutes');
+const couponRoutes = require("./routes/couponRoutes");
+const userRoutes = require("./routes/userRoutes");
+const claimHistoryRoutes = require("./routes/claimHistoryRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -23,59 +23,75 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({
-  origin: "*", // Allows all origins
-  methods: ["GET", "POST", "PUT", "DELETE"], // Specifies allowed HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"] // Specifies allowed headers
-}));
+app.use(
+  cors({
+    origin: [
+      "https://yashvi-round-robin-frontend.vercel.app",
+      "http://localhost:3001",
+    ], // Allows all origins
+    methods: ["GET", "POST", "PUT", "DELETE"], // Specifies allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Specifies allowed headers
+  })
+);
 app.use(helmet());
 
 // Swagger configuration
 const swaggerOptions = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'Coupon Claim API',
-      version: '1.0.0',
-      description: 'API for distributing coupons to users in a round-robin manner',
+      title: "Coupon Claim API",
+      version: "1.0.0",
+      description:
+        "API for distributing coupons to users in a round-robin manner",
     },
-
+    servers: [
+      {
+        url: "https://yashvi-round-robin-backend.vercel.app",
+      },
+      {
+        url: `http://localhost:${PORT}`,
+      },
+    ],
   },
-  apis: ['./routes/*.js', './models/*.js'],
+  apis: ["./routes/*.js", "./models/*.js"],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
-app.get('/', (req, res) => {
-  res.send('Coupon Claim API is running');
+app.get("/", (req, res) => {
+  res.send("Coupon Claim API is running");
 });
 
-app.use('/api/coupons', couponRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/history', claimHistoryRoutes);
+app.use("/api/coupons", couponRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/history", claimHistoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: "Something went wrong!",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
 
 // Connect to MongoDB and start server
-mongoose.connect(process.env.MONGODB_URI)
+mongoose
+  .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    console.log("Connected to MongoDB");
+    if (process.env.NODE_ENV !== "production") {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    }
   })
   .catch((error) => {
-    console.error('Error connecting to MongoDB:', error.message);
+    console.error("Error connecting to MongoDB:", error.message);
   });
 
-module.exports = app; 
+module.exports = app;

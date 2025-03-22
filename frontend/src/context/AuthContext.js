@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('${API_URL}/users', userData);
+      const response = await axios.post(`${API_URL}/users`, userData);
       if (response.data.success) {
         setUser(response.data.user);
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('${API_URL}/users/login', credentials);
+      const response = await axios.post(`${API_URL}/users/login`, credentials);
       if (response.data.success) {
         setUser(response.data.user);
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await axios.post('${API_URL}/users/logout');
+      await axios.post(`${API_URL}/users/logout`);
       localStorage.removeItem('user');
       localStorage.removeItem('token'); // Also remove token on logout
       setUser(null);

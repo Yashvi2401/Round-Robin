@@ -12,6 +12,24 @@ const api = axios.create({
   }
 });
 
+// Add request interceptor to automatically add auth token
+api.interceptors.request.use(
+  (config) => {
+    // Get token from localStorage
+    const token = localStorage.getItem('token');
+    
+    // If token exists, add to headers
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Coupon services
 export const couponService = {
   // Claim a coupon (no auth required)

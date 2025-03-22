@@ -54,6 +54,7 @@ const registerUser = async (req, res) => {
 
       res.status(201).json({
         success: true,
+        token,
         user: {
           _id: user._id,
           email: user.email,
@@ -119,6 +120,7 @@ const loginUser = async (req, res) => {
 
       res.json({
         success: true,
+        token,
         user: {
           _id: user._id,
           email: user.email,
@@ -222,4 +224,4 @@ module.exports = {
   logoutUser,
   getUserProfile,
   getUsers
-}; 
+};

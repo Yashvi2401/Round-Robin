@@ -18,6 +18,13 @@ export const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+      
+      // Make sure we still have a token - if not, clean up the invalid state
+      const token = localStorage.getItem('token');
+      if (!token) {
+        localStorage.removeItem('user');
+        setUser(null);
+      }
     }
     setLoading(false);
   }, []);
@@ -27,10 +34,15 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/users`, userData);
+      const response = await axios.post('${API_URL}/users', userData);
       if (response.data.success) {
         setUser(response.data.user);
         localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Store token in localStorage for API requests
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
       }
       setLoading(false);
       return response.data;
@@ -46,10 +58,15 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/users/login`, credentials);
+      const response = await axios.post('${API_URL}/users/login', credentials);
       if (response.data.success) {
         setUser(response.data.user);
         localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Store token in localStorage for API requests
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
       }
       setLoading(false);
       return response.data;
@@ -64,8 +81,9 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/users/logout`);
+      await axios.post('${API_URL}/users/logout');
       localStorage.removeItem('user');
+      localStorage.removeItem('token'); // Also remove token on logout
       setUser(null);
       setLoading(false);
     } catch (err) {
@@ -93,4 +111,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export default AuthProvider; 
+export default AuthProvider;
